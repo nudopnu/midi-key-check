@@ -18,9 +18,11 @@
     "@angular/platform-browser": "^18.0.0",
     "@angular/platform-browser-dynamic": "^18.0.0",
     "@angular/router": "^18.0.0",
+    "@types/vexflow": "^1.2.42",
     "beautiful-piano": "^0.0.6",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
+    "vexflow": "^4.2.4",
     "zone.js": "~0.14.3"
   },
   "devDependencies": {
