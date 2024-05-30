@@ -14,6 +14,7 @@ export class KeyboardComponent implements AfterViewInit {
     midi: 21 + index,
     isBlack: isBlackKey(21 + index),
     name: midiToPitchName(21 + index) + midiToOctave(21 + index),
+    pressed: false,
   }));
 
   ngAfterViewInit(): void {
