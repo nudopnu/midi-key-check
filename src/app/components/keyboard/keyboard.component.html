@@ -1,7 +1,11 @@
 <div id="piano">
     @for (key of keys; track $index) {
-        <div style="position: relative;">
-            <div [class]="'key ' + (key.isBlack ? 'black' : 'white')" >{{key.name}}</div>
+    <div style="position: relative;">
+        <div [class]="'key ' + (key.isBlack ? 'black' : 'white')">
+            @if (key.name.startsWith('C')) {
+            <span>{{key.name}}</span>
+            }
         </div>
+    </div>
     }
 </div>

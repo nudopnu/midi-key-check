@@ -39,6 +39,10 @@ export function midiToPitchValue(midi: number) {
     return midi % 12 as PitchValue;
 }
 
+export function midiToOctave(midi:number) {
+    return Math.floor(midi / 12);
+}
+
 export function pitchValueToName(pitchValue: PitchValue) {
     return PitchClass[pitchValue][0];
 }

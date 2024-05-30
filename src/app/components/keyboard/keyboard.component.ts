@@ -1,5 +1,5 @@
 import { AfterViewInit, Component } from '@angular/core';
-import { isBlackKey, midiToPitchName } from '../../core/music/utils';
+import { isBlackKey, midiToOctave, midiToPitchName } from '../../core/music/utils';
 
 declare const piano: any;
 
@@ -10,15 +10,14 @@ declare const piano: any;
 })
 export class KeyboardComponent implements AfterViewInit {
 
-  keys = [...Array(10)].map((_, index) => ({
-    midi: 180 + index,
-    isBlack: isBlackKey(180 + index),
-    name: midiToPitchName(180 + index),
+  keys = [...Array(88)].map((_, index) => ({
+    midi: 21 + index,
+    isBlack: isBlackKey(21 + index),
+    name: midiToPitchName(21 + index) + midiToOctave(21 + index),
   }));
 
   ngAfterViewInit(): void {
     console.log(piano);
-
     // piano(document.querySelector('piano'), {octaves: 3});
   }
 

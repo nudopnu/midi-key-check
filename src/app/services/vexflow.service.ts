@@ -38,12 +38,19 @@ export class VexflowService {
     const renderer = new Renderer(element, Renderer.Backends.SVG);
 
     // Configure the rendering context.
-    renderer.resize(350, 250);
+    renderer.resize(330, 250);
     const context = renderer.getContext();
     context.setFont('Arial', 10);
 
-    const stave = new Stave(20, 10, 300);
-    const stave2 = new Stave(20, 120, 300);
+    // Fixing responsive size
+    const svgElement = (context as any)['groups'][0] as SVGElement;
+    svgElement.removeAttribute('width');
+    svgElement.removeAttribute('height');
+    svgElement.style.setProperty('max-height', '80vh');
+    svgElement.style.setProperty('max-width', '90vw');
+
+    const stave = new Stave(20, 10, 300).addClef("treble").addKeySignature("Gb");
+    const stave2 = new Stave(20, 120, 300).addClef("bass").addKeySignature("Gb");
     stave.setContext(context);
     stave2.setContext(context);
 

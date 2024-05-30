@@ -17,5 +17,13 @@ export class HomeComponent implements AfterViewInit {
     this.vexflowService.drawBrace(this.notesElementRef.nativeElement);
   }
 
+  toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+    } else if (document.exitFullscreen) {
+      document.exitFullscreen();
+    }
+  }
+
 
 }
