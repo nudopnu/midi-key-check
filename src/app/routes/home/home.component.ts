@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import { VexflowService } from '../../services/vexflow.service';
+import { VexflowService } from '../../services/VexflowService';
 import { MidiService } from '../../services/midi.service';
 
 @Component({
@@ -18,8 +18,7 @@ export class HomeComponent implements AfterViewInit {
   ) { }
 
   ngAfterViewInit(): void {
-    // this.vexflowService.renderSample(this.notesElementRef.nativeElement.id);
-    this.vexflowService.drawBrace(this.notesElementRef.nativeElement);
+    this.vexflowService.drawMidis(this.notesElementRef.nativeElement, [60, 62]);
   }
 
   toggleFullscreen() {

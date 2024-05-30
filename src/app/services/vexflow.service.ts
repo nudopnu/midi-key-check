@@ -1,68 +1,63 @@
-import { Injectable } from '@angular/core';
 import * as Vex from "vexflow";
+import { Key } from "../core/music/utils";
 
-@Injectable({
-  providedIn: 'root'
-})
-export class VexflowService {
+export class GrandStaff {
 
-  constructor() {
-    console.log(Vex.Flow);
-  }
+  private renderer: any;
+  private context: any;
+  private line: any;
+  private line2: any;
+  private stave: any;
+  private stave2: any;
+  private connector: any;
 
-  renderLowLevel(element: HTMLDivElement) {
-    const { Renderer, Stave } = Vex.Flow;
-
-    // Create an SVG renderer and attach it to the DIV element with id="output".
-    const renderer = new Renderer(element, Renderer.Backends.SVG);
-
-    // Configure the rendering context.
-    renderer.resize(500, 500);
-    const context = renderer.getContext();
-    context.setFont('Arial', 10);
-
-    // Create a stave of width 400 at position 10, 40.
-    const stave = new Stave(10, 40, 400);
-
-    // Add a clef and time signature.
-    stave.addClef('treble').addTimeSignature('4/4');
-
-    // Connect it to the rendering context and draw!
-    stave.setContext(context).draw();
-  }
-
-  drawBrace(element: HTMLDivElement) {
-    const { Renderer, Stave, StaveConnector, StaveNote, Voice } = Vex.Flow;
-
-    // Create an SVG renderer and attach it to the DIV element with id="output".
-    const renderer = new Renderer(element, Renderer.Backends.SVG);
+  constructor(private element: HTMLDivElement, private key: Key) {
+    const { Renderer } = Vex.Flow;
+    this.renderer = new Renderer(this.element, Renderer.Backends.SVG);
+    this.renderer.resize(330, 250);
 
     // Configure the rendering context.
-    renderer.resize(330, 250);
-    const context = renderer.getContext();
-    context.setFont('Arial', 10);
+    this.context = this.renderer.getContext();
+    this.context.setFont('Arial', 10);
 
     // Fixing responsive size
-    const svgElement = (context as any)['groups'][0] as SVGElement;
+    const svgElement = this.context['groups'][0] as SVGElement;
     svgElement.removeAttribute('width');
     svgElement.removeAttribute('height');
-    svgElement.style.setProperty('max-height', '80vh');
+    svgElement.style.setProperty('max-height', '70vh');
     svgElement.style.setProperty('max-width', '90vw');
 
-    // TODO: make to params
-    const signature = "Gb";
-    const notes = [
-      new StaveNote({ keys: ['c/4'], duration: '4' }),
-      new StaveNote({ keys: ['d/4'], duration: '4' }),
-      new StaveNote({ keys: ['a/4'], duration: '4' }),
-      new StaveNote({ keys: ['b/4'], duration: '4' }),
-      new StaveNote({ keys: ['c/5'], duration: '4' }),
-    ];
+    this.initStave();
+  }
 
-    const stave = new Stave(20, 10, 300).addClef("treble").addKeySignature(signature);
-    const stave2 = new Stave(20, 120, 300).addClef("bass").addKeySignature(signature);
-    stave.setContext(context);
-    stave2.setContext(context);
+  private initStave() {
+    const { Stave, StaveConnector } = Vex.Flow;
+
+    const signature = this.key.name;
+    this.stave = new Stave(20, 10, 300).addClef("treble").addKeySignature(signature);
+    this.stave2 = new Stave(20, 120, 300).addClef("bass").addKeySignature(signature);
+    this.stave.setContext(this.context);
+    this.stave2.setContext(this.context);
+
+    this.connector = new StaveConnector(this.stave, this.stave2);
+    this.connector.setType(StaveConnector.type['BRACE']);
+    this.connector.setContext(this.context);
+
+    this.line = new StaveConnector(this.stave, this.stave2);
+    this.line.setType(StaveConnector.type['SINGLE']);
+    this.line.setContext(this.context);
+
+    this.line2 = new StaveConnector(this.stave, this.stave2);
+    this.line2.setType(StaveConnector.type['SINGLE_RIGHT']);
+    this.line2.setContext(this.context);
+  }
+
+  drawNotes(notes: any[], upperStave = true) {
+    const { Voice } = Vex.Flow;
+
+    const signature = this.key.name;
+    const targetStave = upperStave ? this.stave : this.stave2;
+    notes.forEach(note => note.setStave(targetStave))
 
     const voice = new Voice({} as any)
       .setMode(Vex.Flow.Voice.Mode.SOFT)
@@ -70,49 +65,16 @@ export class VexflowService {
     Vex.Flow.Accidental.applyAccidentals([voice], signature);
     new Vex.Flow.Formatter()
       .joinVoices([voice])
-      .formatToStave([voice], stave);
+      .formatToStave([voice], targetStave);
 
-
-    const connector = new StaveConnector(stave, stave2);
-    connector.setType(StaveConnector.type['BRACE']);
-    connector.setContext(context);
-
-    const line = new StaveConnector(stave, stave2);
-    line.setType(StaveConnector.type['SINGLE']);
-    line.setContext(context);
-
-    const line2 = new StaveConnector(stave, stave2);
-    line2.setType(StaveConnector.type['SINGLE_RIGHT']);
-    line2.setContext(context);
-    
-    voice.draw(context, stave);
-    stave.draw();
-    stave2.draw();
-    connector.draw();
-    line.draw();
-    line2.draw();
-  }
-
-  renderSample(elementId: string) {
-    const { Factory, EasyScore, System } = Vex.Flow;
-
-    const vf = new Factory({
-      renderer: { elementId, width: 500, height: 200 },
-    });
-
-    const score = vf.EasyScore();
-    const system = vf.System();
-
-    system
-      .addStave({
-        voices: [
-          score.voice(score.notes('C#5/q, B4, A4, G#4', { stem: 'up' }), {}),
-          score.voice(score.notes('C#4/h, C#4', { stem: 'down' }), {}),
-        ],
-      })
-      .addClef('treble')
-      .addTimeSignature('4/4');
-
-    vf.draw();
+    this.context.clear();
+    this.stave.draw();
+    this.stave2.draw();
+    this.connector.draw();
+    this.line.draw();
+    this.line2.draw();
+    voice.draw(this.context, targetStave);
   }
 }
+
+

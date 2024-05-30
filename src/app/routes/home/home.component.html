@@ -1,5 +1,9 @@
 <main>
     <section id="notes">
+        <div id="stave-buttons">
+            <p-button icon="pi pi-arrow-up" [rounded]="true" severity="secondary" [outlined]="true" />
+            <p-button icon="pi pi-arrow-down" [rounded]="true" severity="secondary" [outlined]="true" />
+        </div>
         <div #notes id="notes"></div>
     </section>
     <section id="keyboard">
@@ -7,7 +11,10 @@
     </section>
 </main>
 
-<div id="icon">
-    <p-button (click)="toggleFullscreen()" [rounded]="true" [outlined]="true" [raised]="true"
+<div id="icon-left">
+    <p-button (click)="toggleFullscreen()" [rounded]="true" [outlined]="true"
         [icon]="'pi pi-window-' + (isFullscreen ? 'minimize' : 'maximize')" severity="secondary" />
+</div>
+<div id="icon-right">
+    <p-button icon="pi pi-cog" [rounded]="true" [outlined]="true" severity="secondary"></p-button>
 </div>
