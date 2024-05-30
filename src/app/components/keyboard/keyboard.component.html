@@ -1,0 +1,7 @@
+<div id="piano">
+    @for (key of keys; track $index) {
+        <div style="position: relative;">
+            <div [class]="'key ' + (key.isBlack ? 'black' : 'white')" >{{key.name}}</div>
+        </div>
+    }
+</div>
