@@ -1,5 +1,5 @@
 <div id="piano">
-    @for (key of keys; track $index) {
+    @for (key of keys(); track $index) {
     <div style="position: relative;">
         <div [class]="'key ' + (key.isBlack ? 'black' : 'white') + (key.pressed ? ' pressed':'')">
             @if (key.name.startsWith('C')) {

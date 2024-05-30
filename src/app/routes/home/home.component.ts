@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { VexflowService } from '../../services/vexflow.service';
+import { MidiService } from '../../services/midi.service';
 
 @Component({
   selector: 'pno-home',
@@ -11,7 +12,10 @@ export class HomeComponent implements AfterViewInit {
   @ViewChild('notes') notesElementRef!: ElementRef;
   isFullscreen = false;
 
-  constructor(private vexflowService: VexflowService) { }
+  constructor(
+    private vexflowService: VexflowService,
+    private midiSerivice: MidiService,
+  ) { }
 
   ngAfterViewInit(): void {
     // this.vexflowService.renderSample(this.notesElementRef.nativeElement.id);
@@ -27,6 +31,5 @@ export class HomeComponent implements AfterViewInit {
       this.isFullscreen = false;
     }
   }
-
 
 }

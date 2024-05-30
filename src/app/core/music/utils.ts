@@ -32,19 +32,40 @@ export type ModeName = keyof ModeType;
 export type ModeDistances<T> = T extends ModeName ? ModeType[T] : never;
 
 export class Key {
-    constructor(name: PitchName, mode: ModeName) { }
+    private distances: ModeType[ModeName];
+    private root: number;
+    constructor(
+        public name: PitchName,
+        public mode: ModeName,
+    ) {
+        this.distances = getModalityDistances(mode);
+        this.root = getPitchValue(name)!;
+    }
 }
 
 export function midiToPitchValue(midi: number) {
     return midi % 12 as PitchValue;
 }
 
-export function midiToOctave(midi:number) {
+export function midiToOctave(midi: number) {
     return Math.floor(midi / 12);
 }
 
-export function pitchValueToName(pitchValue: PitchValue) {
-    return PitchClass[pitchValue][0];
+export function pitchValueToName(pitchValue: PitchValue, preferFlat = true) {
+    const names = PitchClass[pitchValue];
+    return names[preferFlat ? 0 : names.length - 1];
+}
+
+// Function to map a PitchName to the corresponding PitchValue (number)
+export function getPitchValue(pitchName: PitchName): number | undefined {
+    // Iterate through the PitchClass entries to find the pitch name and return its key
+    for (const [key, names] of Object.entries(PitchClass)) {
+        if ((names as readonly string[]).includes(pitchName)) {
+            return parseInt(key);
+        }
+    }
+    // Return undefined if the pitch name is not found
+    return undefined;
 }
 
 export function midiToPitchName(midi: number) {

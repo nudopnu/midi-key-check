@@ -32,7 +32,7 @@ export class VexflowService {
   }
 
   drawBrace(element: HTMLDivElement) {
-    const { Renderer, Stave, StaveConnector } = Vex.Flow;
+    const { Renderer, Stave, StaveConnector, StaveNote, Voice } = Vex.Flow;
 
     // Create an SVG renderer and attach it to the DIV element with id="output".
     const renderer = new Renderer(element, Renderer.Backends.SVG);
@@ -49,10 +49,29 @@ export class VexflowService {
     svgElement.style.setProperty('max-height', '80vh');
     svgElement.style.setProperty('max-width', '90vw');
 
-    const stave = new Stave(20, 10, 300).addClef("treble").addKeySignature("Gb");
-    const stave2 = new Stave(20, 120, 300).addClef("bass").addKeySignature("Gb");
+    // TODO: make to params
+    const signature = "Gb";
+    const notes = [
+      new StaveNote({ keys: ['c/4'], duration: '4' }),
+      new StaveNote({ keys: ['d/4'], duration: '4' }),
+      new StaveNote({ keys: ['a/4'], duration: '4' }),
+      new StaveNote({ keys: ['b/4'], duration: '4' }),
+      new StaveNote({ keys: ['c/5'], duration: '4' }),
+    ];
+
+    const stave = new Stave(20, 10, 300).addClef("treble").addKeySignature(signature);
+    const stave2 = new Stave(20, 120, 300).addClef("bass").addKeySignature(signature);
     stave.setContext(context);
     stave2.setContext(context);
+
+    const voice = new Voice({} as any)
+      .setMode(Vex.Flow.Voice.Mode.SOFT)
+      .addTickables(notes);
+    Vex.Flow.Accidental.applyAccidentals([voice], signature);
+    new Vex.Flow.Formatter()
+      .joinVoices([voice])
+      .formatToStave([voice], stave);
+
 
     const connector = new StaveConnector(stave, stave2);
     connector.setType(StaveConnector.type['BRACE']);
@@ -65,7 +84,8 @@ export class VexflowService {
     const line2 = new StaveConnector(stave, stave2);
     line2.setType(StaveConnector.type['SINGLE_RIGHT']);
     line2.setContext(context);
-
+    
+    voice.draw(context, stave);
     stave.draw();
     stave2.draw();
     connector.draw();

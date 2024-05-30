@@ -40,7 +40,7 @@ SOFTWARE.
 .black {
     position: absolute;
     width: 10px;
-    height: 50px;
+    height: 53px;
     background: linear-gradient(-20deg,#333,#000,#333);
     border-width: 1px 2px 7px;
     border-style: solid;
@@ -51,7 +51,7 @@ SOFTWARE.
 }
 
 .black:active, .black.pressed {
-    height: 53px;
+    height: 50px;
     border-bottom-width: 2px;
     box-shadow: inset 0px -1px 1px rgba(255,255,255,0.4),0 1px 0px rgba(0,0,0,0.8),0 2px 2px rgba(0,0,0,0.4),0 -1px 0px #000;
     border-top: none;
