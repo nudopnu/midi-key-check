@@ -10,6 +10,62 @@ export class VexflowService {
     console.log(Vex.Flow);
   }
 
+  renderLowLevel(element: HTMLDivElement) {
+    const { Renderer, Stave } = Vex.Flow;
+
+    // Create an SVG renderer and attach it to the DIV element with id="output".
+    const renderer = new Renderer(element, Renderer.Backends.SVG);
+
+    // Configure the rendering context.
+    renderer.resize(500, 500);
+    const context = renderer.getContext();
+    context.setFont('Arial', 10);
+
+    // Create a stave of width 400 at position 10, 40.
+    const stave = new Stave(10, 40, 400);
+
+    // Add a clef and time signature.
+    stave.addClef('treble').addTimeSignature('4/4');
+
+    // Connect it to the rendering context and draw!
+    stave.setContext(context).draw();
+  }
+
+  drawBrace(element: HTMLDivElement) {
+    const { Renderer, Stave, StaveConnector } = Vex.Flow;
+
+    // Create an SVG renderer and attach it to the DIV element with id="output".
+    const renderer = new Renderer(element, Renderer.Backends.SVG);
+
+    // Configure the rendering context.
+    renderer.resize(350, 250);
+    const context = renderer.getContext();
+    context.setFont('Arial', 10);
+
+    const stave = new Stave(20, 10, 300);
+    const stave2 = new Stave(20, 120, 300);
+    stave.setContext(context);
+    stave2.setContext(context);
+
+    const connector = new StaveConnector(stave, stave2);
+    connector.setType(StaveConnector.type['BRACE']);
+    connector.setContext(context);
+
+    const line = new StaveConnector(stave, stave2);
+    line.setType(StaveConnector.type['SINGLE']);
+    line.setContext(context);
+
+    const line2 = new StaveConnector(stave, stave2);
+    line2.setType(StaveConnector.type['SINGLE_RIGHT']);
+    line2.setContext(context);
+
+    stave.draw();
+    stave2.draw();
+    connector.draw();
+    line.draw();
+    line2.draw();
+  }
+
   renderSample(elementId: string) {
     const { Factory, EasyScore, System } = Vex.Flow;
 

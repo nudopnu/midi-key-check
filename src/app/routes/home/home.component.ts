@@ -13,7 +13,8 @@ export class HomeComponent implements AfterViewInit {
   constructor(private vexflowService: VexflowService) { }
 
   ngAfterViewInit(): void {
-    this.vexflowService.renderSample(this.notesElementRef.nativeElement.id);
+    // this.vexflowService.renderSample(this.notesElementRef.nativeElement.id);
+    this.vexflowService.drawBrace(this.notesElementRef.nativeElement);
   }
 
 

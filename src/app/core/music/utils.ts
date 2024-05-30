@@ -17,6 +17,24 @@ type PitchClassType = typeof PitchClass;
 export type PitchValue = keyof PitchClassType;
 export type PitchName = PitchClassType[PitchValue][number];
 
+export const Mode = {
+    Ionian: [2, 2, 1, 2, 2, 2, 1],
+    Dorian: [2, 1, 2, 2, 2, 1, 2],
+    Phrygian: [1, 2, 2, 2, 1, 2, 2],
+    Lydian: [2, 2, 2, 1, 2, 2, 1],
+    Mixolydian: [2, 2, 1, 2, 2, 1, 2],
+    Aeolian: [2, 1, 2, 2, 1, 2, 2],
+    Locrian: [1, 2, 2, 1, 2, 2, 2],
+} as const;
+
+type ModeType = typeof Mode;
+export type ModeName = keyof ModeType;
+export type ModeDistances<T> = T extends ModeName ? ModeType[T] : never;
+
+export class Key {
+    constructor(name: PitchName, mode: ModeName) { }
+}
+
 export function midiToPitchValue(midi: number) {
     return midi % 12 as PitchValue;
 }
@@ -31,4 +49,8 @@ export function midiToPitchName(midi: number) {
 
 export function isBlackKey(midi: number) {
     return pitchValueToName(midiToPitchValue(midi)).length > 1;
+}
+
+export function getModalityDistances<T extends ModeName>(modality: T): ModeDistances<T> {
+    return Mode[modality] as ModeDistances<T>;
 }
