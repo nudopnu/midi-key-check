@@ -9,6 +9,7 @@ import { VexflowService } from '../../services/vexflow.service';
 export class HomeComponent implements AfterViewInit {
 
   @ViewChild('notes') notesElementRef!: ElementRef;
+  isFullscreen = false;
 
   constructor(private vexflowService: VexflowService) { }
 
@@ -20,8 +21,10 @@ export class HomeComponent implements AfterViewInit {
   toggleFullscreen() {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen();
+      this.isFullscreen = true;
     } else if (document.exitFullscreen) {
       document.exitFullscreen();
+      this.isFullscreen = false;
     }
   }
 

@@ -7,6 +7,7 @@
     </section>
 </main>
 
-<button id="icon" (click)="toggleFullscreen()">
-    <pno-icon name="maximize"></pno-icon>
-</button>
+<div id="icon">
+    <p-button (click)="toggleFullscreen()" [rounded]="true" [outlined]="true" [raised]="true"
+        [icon]="'pi pi-window-' + (isFullscreen ? 'minimize' : 'maximize')" severity="secondary" />
+</div>

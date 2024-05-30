@@ -6,6 +6,7 @@ import { AppComponent } from './app.component';
 import { HomeComponent } from './routes/home/home.component';
 import { KeyboardComponent } from './components/keyboard/keyboard.component';
 import { IconComponent } from './compontents/icon/icon.component';
+import { PrimeModule } from './modules/prime/prime.module';
 
 @NgModule({
   declarations: [
@@ -16,7 +17,8 @@ import { IconComponent } from './compontents/icon/icon.component';
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    PrimeModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
