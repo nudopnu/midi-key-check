@@ -1,6 +1,8 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import { VexflowService } from '../../services/VexflowService';
+import { VexflowService } from '../../services/vexflow.service';
 import { MidiService } from '../../services/midi.service';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { NotesService } from '../../services/notes.service';
 
 @Component({
   selector: 'pno-home',
@@ -15,10 +17,16 @@ export class HomeComponent implements AfterViewInit {
   constructor(
     private vexflowService: VexflowService,
     private midiSerivice: MidiService,
-  ) { }
+    private notesService: NotesService,
+  ) {
+    toObservable(notesService.pressed).subscribe(pressed => {
+      if (pressed.length === 0) return;
+      vexflowService.drawMidis(pressed);
+    });
+  }
 
   ngAfterViewInit(): void {
-    this.vexflowService.drawMidis(this.notesElementRef.nativeElement, [60, 62]);
+    this.vexflowService.init(this.notesElementRef.nativeElement);
   }
 
   toggleFullscreen() {

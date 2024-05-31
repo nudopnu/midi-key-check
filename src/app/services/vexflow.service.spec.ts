@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { VexflowService } from './VexflowService';
+import { VexflowService } from './vexflow.service';
 
 describe('VexflowService', () => {
   let service: VexflowService;
