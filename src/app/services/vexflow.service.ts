@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import * as Vex from "vexflow";
+import { Key, PitchName, midiToOctave, midiToPitchName } from '../core/music/utils';
 import { GrandStaff } from './GrandStaff';
-import { Key, midiToOctave, midiToPitchName } from '../core/music/utils';
-import { NotesService } from './notes.service';
-import { toObservable } from "@angular/core/rxjs-interop";
+
 @Injectable({
   providedIn: 'root'
 })
@@ -24,7 +23,7 @@ export class VexflowService {
     }
     const keys = midis.map(midi => `${midiToPitchName(midi)}/${midiToOctave(midi)}`);
     console.log(keys);
-    
+
     const notes = [
       new Vex.Flow.StaveNote({ keys, duration: '4' }),
     ];
@@ -148,5 +147,67 @@ export class VexflowService {
       .addTimeSignature('4/4');
 
     vf.draw();
+  }
+
+  renderKeySignature(elementId: string, keySignature: string) {
+    const { Factory, EasyScore, System } = Vex.Flow;
+
+    const vf = new Factory({
+      renderer: { elementId, width: 130, height: 200 },
+    });
+
+    const score = vf.EasyScore();
+    const system = vf.System();
+
+    system
+      .addStave({ voices: [] })
+      .addClef('treble')
+      .addKeySignature(keySignature);
+
+    vf.draw();
+  }
+
+  renderRests(element: HTMLDivElement) {
+    const { Renderer, Stave, StaveConnector, StaveNote, Voice } = Vex.Flow;
+
+    // Create an SVG renderer and attach it to the DIV element with id="output".
+    const renderer = new Renderer(element, Renderer.Backends.SVG);
+
+    // Configure the rendering context.
+    renderer.resize(330, 250);
+    const context = renderer.getContext();
+    context.setFont('Arial', 10);
+
+    // Fixing responsive size
+    const svgElement = (context as any)['groups'][0] as SVGElement;
+    svgElement.removeAttribute('width');
+    svgElement.removeAttribute('height');
+    svgElement.style.setProperty('max-height', '80vh');
+    svgElement.style.setProperty('max-width', '90vw');
+    const VF = Vex.Flow;
+    function newNote(note_struct: any) { return new VF.StaveNote(note_struct); }
+
+    var notes = [
+      newNote({ keys: ["b/4"], stem_direction: 1, duration: "wr" }),
+      newNote({ keys: ["b/4"], stem_direction: 1, duration: "hr" }),
+      newNote({ keys: ["b/4"], stem_direction: 1, duration: "qr" }),
+      newNote({ keys: ["b/4"], stem_direction: 1, duration: "8r" }),
+      newNote({ keys: ["b/4"], stem_direction: 1, duration: "16r" }),
+      newNote({ keys: ["b/4"], stem_direction: 1, duration: "32r" }),
+      newNote({ keys: ["b/4"], stem_direction: 1, duration: "64r" })
+    ];
+
+    var voice = new VF.Voice({} as any);
+    const stave = new Stave(20, 10, 300).addClef("treble");
+    stave.setContext(context);
+
+    voice.setStrict(false);
+    voice.addTickables(notes);
+    stave.addTimeSignature("4/4");
+    stave.draw();
+
+    VF.Formatter.FormatAndDraw(context, stave, notes);
+
+    voice.draw(context, stave);
   }
 }
