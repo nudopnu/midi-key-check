@@ -112,6 +112,30 @@ export class MidiService {
         });
       } else if (result.state === "prompt") {
         // Using API will prompt for permission
+        navigator.requestMIDIAccess().then((access) => {
+          // Get lists of available MIDI controllers
+          const inputs = access.inputs
+          const outputs = access.outputs
+
+          console.log(inputs, outputs);
+          inputs.forEach((entry) => {
+            entry.onmidimessage = (event) => {
+              if (!event.data || event.data.byteLength === 1) return;
+              const midiEvent = parseMidiBytes(event.data!);
+
+              switch (midiEvent.type) {
+                case 'noteOn':
+                  notesService.pressed.set([...notesService.pressed(), midiEvent.midi!])
+                  break;
+                case 'noteOff':
+                  notesService.pressed.set(notesService.pressed().filter(midi => midi !== midiEvent.midi))
+                  break;
+                case 'controlChange':
+                  break;
+              }
+            };
+          });
+        })
       }
       // Permission was denied by user prompt or permission policy
     });
