@@ -12,9 +12,9 @@
 </main>
 
 <div id="icon-left">
-    <p-button (click)="toggleFullscreen()" [rounded]="true" [outlined]="true"
-        [icon]="'pi pi-window-' + (isFullscreen ? 'minimize' : 'maximize')" severity="secondary" />
 </div>
 <div id="icon-right">
     <p-button icon="pi pi-cog" [rounded]="true" [outlined]="true" severity="secondary"></p-button>
+    <p-button (click)="toggleFullscreen()" [rounded]="true" [outlined]="true"
+        [icon]="'pi pi-window-' + (isFullscreen ? 'minimize' : 'maximize')" severity="secondary" />
 </div>
