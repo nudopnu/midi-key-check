@@ -25,12 +25,12 @@ jobs:
       run: npm run build:prod
 
     - name: Enable Routing
-      run: cp dist/midi-key-check/browser/index.html dist/midi-key-check/browser/404.html
+      run: cp dist/piano/browser/index.html dist/piano/browser/404.html
 
     - name: Deploy
       if: success()
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: dist/midi-key-check/browser
+        publish_dir: dist/piano/browser
         enable_jekyll: true
