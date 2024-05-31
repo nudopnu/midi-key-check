@@ -3,6 +3,7 @@ import { VexflowService } from '../../services/vexflow.service';
 import { MidiService } from '../../services/midi.service';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { NotesService } from '../../services/notes.service';
+import { combineLatest } from 'rxjs';
 
 @Component({
   selector: 'pno-home',
@@ -38,14 +39,23 @@ export class HomeComponent implements AfterViewInit {
     private midiSerivice: MidiService,
     private notesService: NotesService,
   ) {
-    toObservable(notesService.pressed).subscribe(pressed => {
-      if (pressed.length === 0) return;
-      vexflowService.drawMidis(pressed);
+    combineLatest({
+      pressed: toObservable(notesService.pressed),
+      key: toObservable(notesService.key),
+      upperStave: toObservable(notesService.upperStave),
+    }).subscribe(({ pressed, key, upperStave }) => {
+      vexflowService.setKey(key);
+      vexflowService.setHighlight(upperStave);
+      vexflowService.drawMidis(pressed, upperStave);
     });
   }
 
   ngAfterViewInit(): void {
-    this.vexflowService.init(this.notesElementRef.nativeElement);
+    this.vexflowService.init(this.notesElementRef.nativeElement, (element, event) => {
+      const { y, height } = element.getBoundingClientRect();
+      const onUpperHalf = y + height / 2 >= event.clientY;
+      this.notesService.upperStave.set(onUpperHalf);
+    });
   }
 
   toggleFullscreen() {
@@ -59,7 +69,7 @@ export class HomeComponent implements AfterViewInit {
   }
 
   setKey(key: (typeof this.keys)[number]) {
-    this.vexflowService.setKey(key.value);
+    this.notesService.key.set(key.value);
   }
 
 }

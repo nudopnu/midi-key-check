@@ -2,6 +2,8 @@ import * as Vex from "vexflow";
 
 export class GrandStaff {
 
+  focusUpperStave = true;
+  svgElement: SVGElement;
   private renderer: any;
   private context: any;
   private line: any;
@@ -20,14 +22,36 @@ export class GrandStaff {
     this.context.setFont('Arial', 10);
 
     // Fixing responsive size
-    const svgElement = this.context['groups'][0] as SVGElement;
-    svgElement.removeAttribute('width');
-    svgElement.removeAttribute('height');
-    svgElement.style.setProperty('max-height', '70vh');
-    svgElement.style.setProperty('max-width', '90vw');
+    this.svgElement = this.context['groups'][0] as SVGElement;
+    this.svgElement.removeAttribute('width');
+    this.svgElement.removeAttribute('height');
+    this.svgElement.style.setProperty('max-height', '70vh');
+    this.svgElement.style.setProperty('max-width', '90vw');
 
     this.initStave();
     this.drawStave();
+  }
+
+  greyOut(upperstave = false) {
+    const staves = this.svgElement.querySelectorAll('.vf-stave');
+    const clefs = this.svgElement.querySelectorAll('.vf-clef');
+    const keySignatures = this.svgElement.querySelectorAll('.vf-keysignature');
+
+    const upperStave = staves[0];
+    const lowerStave = staves[1];
+    const upperClef = clefs[0];
+    const lowerClef = clefs[1];
+    const upperKeySignature = keySignatures[0];
+    const lowerKeySignature = keySignatures[1];
+
+    const upperColor = upperstave ? '#c3c3c3' : '#000';
+    const lowerColor = upperstave ? '#000' : '#c3c3c3';
+    upperKeySignature.setAttribute('fill', upperColor);
+    upperStave.setAttribute('stroke', upperColor);
+    upperClef.setAttribute('fill', upperColor);
+    lowerKeySignature.setAttribute('fill', lowerColor);
+    lowerStave.setAttribute('stroke', lowerColor);
+    lowerClef.setAttribute('fill', lowerColor);
   }
 
   private initStave() {
@@ -58,6 +82,7 @@ export class GrandStaff {
     this.connector.draw();
     this.line.draw();
     this.line2.draw();
+    this.greyOut(!this.focusUpperStave);
   }
 
   drawNotes(notes: any[], upperStave = true) {

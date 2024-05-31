@@ -10,22 +10,25 @@ export class VexflowService {
 
   grandStaff: GrandStaff | undefined;
   element: HTMLDivElement | undefined;
+  highlightUpperStave: boolean = true;
 
   constructor() { }
 
-  init(element: HTMLDivElement) {
+  init(element: HTMLDivElement, onClick?: ((svgElement: SVGElement, ev: MouseEvent) => any) | null) {
     this.element = element;
     this.grandStaff = new GrandStaff(element, "C");
+    if (onClick) {
+      this.grandStaff.svgElement.onclick = (event) => onClick(this.grandStaff!.svgElement, event);
+    }
   }
 
   drawMidis(midis: number[], upperStave = true) {
     if (!this.grandStaff) throw new Error('VecflowService not initialized!');
+    if (midis.length === 0) return;
     if (!upperStave) {
       midis = midis.map(midi => midi + 21);
     }
     const keys = midis.map(midi => `${midiToPitchName(midi)}/${midiToOctave(midi)}`);
-    console.log(keys);
-
     const notes = [
       new Vex.Flow.StaveNote({ keys, duration: '4' }),
     ];
@@ -36,6 +39,14 @@ export class VexflowService {
   setKey(key: string) {
     if (!this.grandStaff || !this.element) throw new Error('VecflowService not initialized!');
     this.grandStaff.setKey(key);
+  }
+
+  setHighlight(upperStave: boolean) {
+    this.highlightUpperStave = upperStave;
+    this.grandStaff!.focusUpperStave = upperStave;
+    this.grandStaff?.greyOut(!upperStave);
+    console.log("Greying out 0", upperStave);
+
   }
 
   drawPianoNotes(element: HTMLDivElement) {

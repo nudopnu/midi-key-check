@@ -6,5 +6,7 @@ import { Injectable, signal } from '@angular/core';
 export class NotesService {
 
   pressed = signal([] as number[]);
+  upperStave = signal(true);
+  key = signal("C");
 
 }
