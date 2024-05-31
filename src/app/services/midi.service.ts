@@ -17,7 +17,7 @@ type MidiEvent = {
  * @param midiBytes Array of MIDI byte messages.
  * @returns Array of structured MIDI events.
  */
-function parseMidiBytes(midiBytes: Uint8Array): MidiEvent {
+function parseMidiBytes(midiBytes: Uint8Array): MidiEvent[] {
   const events: MidiEvent[] = [];
   let i = 0;
   while (i < midiBytes.length) {
@@ -71,7 +71,7 @@ function parseMidiBytes(midiBytes: Uint8Array): MidiEvent {
       // Add cases for other relevant MIDI messages as needed
     }
   }
-  return events[0];
+  return events;
 }
 
 
@@ -81,64 +81,46 @@ function parseMidiBytes(midiBytes: Uint8Array): MidiEvent {
 export class MidiService {
 
   constructor(
-    notesService: NotesService,
+    private notesService: NotesService,
   ) {
     navigator.permissions.query({ name: "midi", sysex: true } as any).then((result) => {
       if (result.state === "granted") {
         // Access granted.
-        navigator.requestMIDIAccess().then((access) => {
-          // Get lists of available MIDI controllers
-          const inputs = access.inputs
-          const outputs = access.outputs
-
-          console.log(inputs, outputs);
-          inputs.forEach((entry) => {
-            entry.onmidimessage = (event) => {
-              if (!event.data || event.data.byteLength === 1) return;
-              const midiEvent = parseMidiBytes(event.data!);
-
-              switch (midiEvent.type) {
-                case 'noteOn':
-                  notesService.pressed.set([...notesService.pressed(), midiEvent.midi!])
-                  break;
-                case 'noteOff':
-                  notesService.pressed.set(notesService.pressed().filter(midi => midi !== midiEvent.midi))
-                  break;
-                case 'controlChange':
-                  break;
-              }
-            };
-          });
-        });
+        this.requestMidiAccess();
       } else if (result.state === "prompt") {
         // Using API will prompt for permission
-        navigator.requestMIDIAccess().then((access) => {
-          // Get lists of available MIDI controllers
-          const inputs = access.inputs
-          const outputs = access.outputs
-
-          console.log(inputs, outputs);
-          inputs.forEach((entry) => {
-            entry.onmidimessage = (event) => {
-              if (!event.data || event.data.byteLength === 1) return;
-              const midiEvent = parseMidiBytes(event.data!);
-
-              switch (midiEvent.type) {
-                case 'noteOn':
-                  notesService.pressed.set([...notesService.pressed(), midiEvent.midi!])
-                  break;
-                case 'noteOff':
-                  notesService.pressed.set(notesService.pressed().filter(midi => midi !== midiEvent.midi))
-                  break;
-                case 'controlChange':
-                  break;
-              }
-            };
-          });
-        })
+        this.requestMidiAccess();
       }
       // Permission was denied by user prompt or permission policy
     });
   }
 
+
+  private requestMidiAccess() {
+    navigator.requestMIDIAccess().then((access) => {
+      // Get lists of available MIDI controllers
+      const inputs = access.inputs;
+      const outputs = access.outputs;
+
+      console.log(inputs, outputs);
+      inputs.forEach((entry) => {
+        entry.onmidimessage = (event) => {
+          if (!event.data || event.data.byteLength === 1) return;
+          const midiEvents = parseMidiBytes(event.data!);
+          for (const midiEvent of midiEvents) {
+            switch (midiEvent.type) {
+              case 'noteOn':
+                this.notesService.pressed.set([...this.notesService.pressed(), midiEvent.midi!]);
+                break;
+              case 'noteOff':
+                this.notesService.pressed.set(this.notesService.pressed().filter(midi => midi !== midiEvent.midi));
+                break;
+              case 'controlChange':
+                break;
+            }
+          }
+        };
+      });
+    });
+  }
 }
