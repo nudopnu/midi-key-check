@@ -5,7 +5,8 @@ import { DropdownModule } from 'primeng/dropdown';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { DividerModule } from 'primeng/divider';
 import { ToggleButtonModule } from 'primeng/togglebutton';
-
+import { SidebarModule } from 'primeng/sidebar';
+import { ListboxModule } from 'primeng/listbox';
 
 @NgModule({
   exports: [
@@ -14,6 +15,8 @@ import { ToggleButtonModule } from 'primeng/togglebutton';
     SelectButtonModule,
     DividerModule,
     ToggleButtonModule,
+    SidebarModule,
+    ListboxModule,
   ]
 })
 export class PrimeModule { }

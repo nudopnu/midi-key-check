@@ -13,6 +13,25 @@ export class HomeComponent implements AfterViewInit {
 
   @ViewChild('notes') notesElementRef!: ElementRef;
   isFullscreen = false;
+  sidebarVisible = false;
+  keys = [
+    { major: "C", minor: "A", value: "C", icon: "C" },
+    { major: "F", minor: "D", value: "F", icon: "F" },
+    { major: "Bb", minor: "G", value: "Bb", icon: "Bb" },
+    { major: "Eb", minor: "C", value: "Eb", icon: "Eb" },
+    { major: "Ab", minor: "F", value: "Ab", icon: "Ab" },
+    { major: "Db", minor: "Bb", value: "Db", icon: "Db" },
+    { major: "Gb", minor: "Eb", value: "Gb", icon: "Gb" },
+    { major: "Cb", minor: "Ab", value: "Cb", icon: "Cb" },
+    { major: "G", minor: "E", value: "G", icon: "G" },
+    { major: "D", minor: "B", value: "D", icon: "D" },
+    { major: "A", minor: "F#", value: "A", icon: "A" },
+    { major: "E", minor: "C#", value: "E", icon: "E" },
+    { major: "B", minor: "G#", value: "B", icon: "B" },
+    { major: "F#", minor: "D#", value: "F#", icon: "Fs" },
+    { major: "C#", minor: "A#", value: "C#", icon: "Cs" },
+  ];
+  selectedKey = this.keys[0];
 
   constructor(
     private vexflowService: VexflowService,
@@ -37,6 +56,10 @@ export class HomeComponent implements AfterViewInit {
       document.exitFullscreen();
       this.isFullscreen = false;
     }
+  }
+
+  setKey(key: (typeof this.keys)[number]) {
+    this.vexflowService.setKey(key.value);
   }
 
 }

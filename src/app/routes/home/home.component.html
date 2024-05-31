@@ -2,7 +2,7 @@
     <section id="notes">
         <div #notes id="notes"></div>
         <div id="stave-buttons">
-            <p-button icon="pi pi-arrow-up" [rounded]="true" severity="secondary" [outlined]="true" severity="info"/>
+            <p-button icon="pi pi-arrow-up" [rounded]="true" severity="secondary" [outlined]="true" severity="info" />
         </div>
     </section>
     <section id="keyboard">
@@ -13,7 +13,25 @@
 <div id="icon-left">
 </div>
 <div id="icon-right">
-    <p-button icon="pi pi-cog" [rounded]="true" [outlined]="true" severity="secondary"></p-button>
+    <p-button (click)="sidebarVisible = true" icon="pi pi-cog" [rounded]="true" [outlined]="true"
+        severity="secondary"></p-button>
     <p-button (click)="toggleFullscreen()" [rounded]="true" [outlined]="true"
         [icon]="'pi pi-window-' + (isFullscreen ? 'minimize' : 'maximize')" severity="secondary" />
 </div>
+
+<p-sidebar [(visible)]="sidebarVisible">
+    <h3>Settings</h3>
+    <p>Select Key:</p>
+    <p-listbox [options]="keys" [ngModel]="selectedKey" (ngModelChange)="setKey($event)" optionLabel="name" [listStyle]="{ 'max-height': '250px' }"
+        [style]="{ width: '15rem', margin: '0 20px' }">
+        <ng-template let-key pTemplate="item">
+            <div style="display: flex; align-items: center; width: 100%; gap: 14px;">
+                <img [src]="'./keys/' + key.icon + '.svg'" style="width: 45px" />
+                <div style="display: flex; align-items: baseline; gap: 4px;">
+                    <span style="font-weight: bold;">{{ key.major }} Major</span>
+                    <span style="font-size: small;">({{ key.minor }} Minor)</span>
+                </div>
+            </div>
+        </ng-template>
+    </p-listbox>
+</p-sidebar>

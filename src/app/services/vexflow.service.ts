@@ -9,11 +9,13 @@ import { GrandStaff } from './GrandStaff';
 export class VexflowService {
 
   grandStaff: GrandStaff | undefined;
+  element: HTMLDivElement | undefined;
 
   constructor() { }
 
   init(element: HTMLDivElement) {
-    this.grandStaff = new GrandStaff(element, new Key("Gb", "Ionian"));
+    this.element = element;
+    this.grandStaff = new GrandStaff(element, "C");
   }
 
   drawMidis(midis: number[], upperStave = true) {
@@ -31,6 +33,11 @@ export class VexflowService {
     this.grandStaff.drawNotes(notes, upperStave);
   }
 
+  setKey(key: string) {
+    if (!this.grandStaff || !this.element) throw new Error('VecflowService not initialized!');
+    this.grandStaff.setKey(key);
+  }
+
   drawPianoNotes(element: HTMLDivElement) {
     const notes = [
       new Vex.Flow.StaveNote({ keys: ['c/4'], duration: '4' }),
@@ -39,7 +46,7 @@ export class VexflowService {
       new Vex.Flow.StaveNote({ keys: ['b/4'], duration: '4' }),
       new Vex.Flow.StaveNote({ keys: ['c/5'], duration: '4' }),
     ];
-    const grandStaff = new GrandStaff(element, new Key("C", "Ionian"));
+    const grandStaff = new GrandStaff(element, "C");
     grandStaff.drawNotes(notes);
   }
 

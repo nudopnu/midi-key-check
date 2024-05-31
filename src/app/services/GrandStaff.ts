@@ -1,5 +1,4 @@
 import * as Vex from "vexflow";
-import { Key } from "../core/music/utils";
 
 export class GrandStaff {
 
@@ -11,7 +10,7 @@ export class GrandStaff {
   private stave2: any;
   private connector: any;
 
-  constructor(private element: HTMLDivElement, private key: Key) {
+  constructor(private element: HTMLDivElement, private signature: string) {
     const { Renderer } = Vex.Flow;
     this.renderer = new Renderer(this.element, Renderer.Backends.SVG);
     this.renderer.resize(330, 250);
@@ -34,9 +33,8 @@ export class GrandStaff {
   private initStave() {
     const { Stave, StaveConnector } = Vex.Flow;
 
-    const signature = this.key.name;
-    this.stave = new Stave(20, 10, 300).addClef("treble").addKeySignature(signature);
-    this.stave2 = new Stave(20, 120, 300).addClef("bass").addKeySignature(signature);
+    this.stave = new Stave(20, 10, 300).addClef("treble").addKeySignature(this.signature);
+    this.stave2 = new Stave(20, 120, 300).addClef("bass").addKeySignature(this.signature);
     this.stave.setContext(this.context);
     this.stave2.setContext(this.context);
 
@@ -65,20 +63,27 @@ export class GrandStaff {
   drawNotes(notes: any[], upperStave = true) {
     const { Voice } = Vex.Flow;
 
-    const signature = this.key.name;
     const targetStave = upperStave ? this.stave : this.stave2;
     notes.forEach(note => note.setStave(targetStave))
 
     const voice = new Voice({} as any)
       .setMode(Vex.Flow.Voice.Mode.SOFT)
       .addTickables(notes);
-    Vex.Flow.Accidental.applyAccidentals([voice], signature);
+    Vex.Flow.Accidental.applyAccidentals([voice], this.signature);
     new Vex.Flow.Formatter()
       .joinVoices([voice])
       .formatToStave([voice], targetStave);
 
     voice.draw(this.context, targetStave);
   }
+
+  setKey(signature: string) {
+    this.signature = signature;
+    this.context.clear();
+    this.initStave();
+    this.drawStave();
+  }
+
 }
 
 
