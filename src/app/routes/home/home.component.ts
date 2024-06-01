@@ -1,16 +1,16 @@
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { VexflowService } from '../../services/vexflow.service';
 import { MidiService } from '../../services/midi.service';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { NotesService } from '../../services/notes.service';
-import { combineLatest } from 'rxjs';
+import { Subscription, combineLatest } from 'rxjs';
 
 @Component({
   selector: 'pno-home',
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
-export class HomeComponent implements AfterViewInit {
+export class HomeComponent implements AfterViewInit, OnDestroy {
 
   @ViewChild('notes') notesElementRef!: ElementRef;
   isFullscreen = false;
@@ -33,13 +33,14 @@ export class HomeComponent implements AfterViewInit {
     { major: "C#", minor: "A#", value: "C#", icon: "Cs" },
   ];
   selectedKey = this.keys[0];
+  subscription: Subscription;
 
   constructor(
     private vexflowService: VexflowService,
     private midiSerivice: MidiService,
     private notesService: NotesService,
   ) {
-    combineLatest({
+    this.subscription = combineLatest({
       pressed: toObservable(notesService.pressed),
       key: toObservable(notesService.key),
       upperStave: toObservable(notesService.upperStave),
@@ -48,6 +49,10 @@ export class HomeComponent implements AfterViewInit {
       vexflowService.setHighlight(upperStave);
       vexflowService.drawMidis(pressed, upperStave);
     });
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 
   ngAfterViewInit(): void {
