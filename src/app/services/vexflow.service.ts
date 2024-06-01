@@ -25,12 +25,9 @@ export class VexflowService {
   drawMidis(midis: number[], upperStave = true) {
     if (!this.grandStaff) throw new Error('VecflowService not initialized!');
     if (midis.length === 0) return;
-    if (!upperStave) {
-      midis = midis.map(midi => midi + 21);
-    }
     const keys = midis.map(midi => `${midiToPitchName(midi)}/${midiToOctave(midi)}`);
     const notes = [
-      new Vex.Flow.StaveNote({ keys, duration: '4' }),
+      new Vex.Flow.StaveNote({ keys, duration: '4', clef: upperStave ? "treble" : "bass" }),
     ];
     this.grandStaff.drawStave();
     this.grandStaff.drawNotes(notes, upperStave);
