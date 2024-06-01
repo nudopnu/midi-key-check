@@ -9,7 +9,6 @@ import { NotesService } from '../../services/notes.service';
   styleUrl: './keyboard.component.scss'
 })
 export class KeyboardComponent {
-
   keys = computed(() => [...Array(88)].map((_, index) => ({
     midi: 21 + index,
     isBlack: isBlackKey(21 + index),
@@ -19,5 +18,12 @@ export class KeyboardComponent {
 
   constructor(private notesService: NotesService) { }
 
-
+  onClick(key: { midi: number; isBlack: boolean; name: string; pressed: boolean; }) {
+    const pressed = this.notesService.pressed();
+    if (pressed.indexOf(key.midi) === -1) {
+      this.notesService.pressed.set([...pressed, key.midi]);
+    } else {
+      this.notesService.pressed.set(pressed.filter(midi => midi !== key.midi));
+    }
+  }
 }
