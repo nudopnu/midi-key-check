@@ -2,10 +2,13 @@ import { Injectable } from '@angular/core';
 import { VexflowService } from './vexflow.service';
 import { NotesService } from './notes.service';
 
+type PedalName = 'sustain' | 'sustenuto' | 'soft' | 'unknown';
+
 type MidiEvent = {
   deltaTime: number;  // We'll assume deltaTime needs to be provided or calculated externally.
-  type: 'noteOn' | 'noteOff' | 'controlChange';
+  type: 'noteOn' | 'noteOff' | 'pedalOn' | 'pedalOff' | 'controlChange';
   channel: number;
+  pedalName?: PedalName;
   midi?: number;
   velocity?: number;
   controllerNumber?: number;
@@ -60,13 +63,38 @@ function parseMidiBytes(midiBytes: Uint8Array): MidiEvent[] {
       case 0xB0: // Control Change
         const controllerNumber = midiBytes[i++];
         const controllerValue = midiBytes[i++];
-        events.push({
-          deltaTime: 0,  // Example, should be calculated
-          type: 'controlChange',
-          channel,
-          controllerNumber,
-          controllerValue
-        });
+        if (controllerNumber == 64 || controllerNumber === 66 || controllerNumber == 67) {
+          const pedalType = controllerValue >= 64 ? 'pedalOn' : 'pedalOff';
+          let pedalName = 'unknown' as PedalName;
+          switch (controllerNumber) {
+            case 64:
+              pedalName = 'sustain';
+              break;
+            case 66:
+              pedalName = 'sustenuto';
+              break;
+            case 67:
+              pedalName = 'soft';
+              break;
+          }
+          events.push({
+            deltaTime: 0,  // Example, should be calculated
+            type: pedalType,
+            pedalName,
+            channel,
+            controllerNumber,
+            controllerValue
+          })
+        } else {
+          events.push({
+            deltaTime: 0,  // Example, should be calculated
+            type: 'controlChange',
+            channel,
+            controllerNumber,
+            controllerValue
+          });
+        }
+        console.log(events[events.length - 1]);
         break;
       // Add cases for other relevant MIDI messages as needed
     }
@@ -114,6 +142,10 @@ export class MidiService {
                 break;
               case 'noteOff':
                 this.notesService.pressed.set(this.notesService.pressed().filter(midi => midi !== midiEvent.midi));
+                break;
+              case 'pedalOn':
+                if (midiEvent.pedalName !== "soft") break;
+                this.notesService.upperStave.set(!this.notesService.upperStave());
                 break;
               case 'controlChange':
                 break;
