@@ -1,6 +1,7 @@
 import { Component, computed } from '@angular/core';
 import { isBlackKey, midiToOctave, midiToPitchName } from '../../core/music/utils';
 import { NotesService } from '../../services/notes.service';
+import { SoundSynthesizerService } from '../../services/sound-synthesizer.service';
 
 
 @Component({
@@ -16,12 +17,16 @@ export class KeyboardComponent {
     pressed: this.notesService.pressed().indexOf(21 + index) !== -1,
   })));
 
-  constructor(private notesService: NotesService) { }
+  constructor(
+    private notesService: NotesService,
+    private soundSynthesizerService: SoundSynthesizerService,
+  ) { }
 
   onClick(key: { midi: number; isBlack: boolean; name: string; pressed: boolean; }) {
     const pressed = this.notesService.pressed();
     if (pressed.indexOf(key.midi) === -1) {
       this.notesService.pressed.set([...pressed, key.midi]);
+      this.soundSynthesizerService.playPianoKey(key.midi);
     } else {
       this.notesService.pressed.set(pressed.filter(midi => midi !== key.midi));
     }
