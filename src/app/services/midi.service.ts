@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { NotesService } from './notes.service';
 
 type PedalName = 'sustain' | 'sustenuto' | 'soft' | 'unknown';
@@ -126,9 +126,12 @@ export class MidiService {
 
   private listenForInputs(midiAccess: MIDIAccess) {
     const inputs = midiAccess.inputs;
-    if (Object.keys(inputs).length === 0) return;
+
+    if ((inputs as any)['size'] === 0) return;
     inputs.forEach((entry) => {
-      entry.onmidimessage = (event) => this.onMidiMessage(event);
+      entry.onmidimessage = (event) => {
+        this.onMidiMessage(event);
+      };
     });
   }
 
