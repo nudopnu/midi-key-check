@@ -116,36 +116,40 @@ export class MidiService {
     });
   }
 
+  private async requestMidiAccess() {
+    const midiAccess = await navigator.requestMIDIAccess();
+    midiAccess.onstatechange = () => {
+      this.listenForInputs(midiAccess);
+    };
+    this.listenForInputs(midiAccess);
+  }
 
-  private requestMidiAccess() {
-    navigator.requestMIDIAccess().then((access) => {
-      // Get lists of available MIDI controllers
-      const inputs = access.inputs;
-      const outputs = access.outputs;
-
-      console.log(inputs, outputs);
-      inputs.forEach((entry) => {
-        entry.onmidimessage = (event) => {
-          if (!event.data || event.data.byteLength === 1) return;
-          const midiEvents = parseMidiBytes(event.data!);
-          for (const midiEvent of midiEvents) {
-            switch (midiEvent.type) {
-              case 'noteOn':
-                this.notesService.pressed.set([...this.notesService.pressed(), midiEvent.midi!]);
-                break;
-              case 'noteOff':
-                this.notesService.pressed.set(this.notesService.pressed().filter(midi => midi !== midiEvent.midi));
-                break;
-              case 'pedalOn':
-                if (midiEvent.pedalName !== "soft") break;
-                this.notesService.upperStave.set(!this.notesService.upperStave());
-                break;
-              case 'controlChange':
-                break;
-            }
-          }
-        };
-      });
+  private listenForInputs(midiAccess: MIDIAccess) {
+    const inputs = midiAccess.inputs;
+    if (Object.keys(inputs).length === 0) return;
+    inputs.forEach((entry) => {
+      entry.onmidimessage = (event) => this.onMidiMessage(event);
     });
+  }
+
+  private onMidiMessage(event: MIDIMessageEvent) {
+    if (!event.data || event.data.byteLength === 1) return;
+    const midiEvents = parseMidiBytes(event.data);
+    for (const midiEvent of midiEvents) {
+      switch (midiEvent.type) {
+        case 'noteOn':
+          this.notesService.pressed.set([...this.notesService.pressed(), midiEvent.midi!]);
+          break;
+        case 'noteOff':
+          this.notesService.pressed.set(this.notesService.pressed().filter(midi => midi !== midiEvent.midi));
+          break;
+        case 'pedalOn':
+          if (midiEvent.pedalName !== "soft") break;
+          this.notesService.upperStave.set(!this.notesService.upperStave());
+          break;
+        case 'controlChange':
+          break;
+      }
+    }
   }
 }
