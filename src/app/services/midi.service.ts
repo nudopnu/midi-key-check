@@ -1,11 +1,9 @@
 import { Injectable } from '@angular/core';
-import { VexflowService } from './vexflow.service';
 import { NotesService } from './notes.service';
 
 type PedalName = 'sustain' | 'sustenuto' | 'soft' | 'unknown';
 
 type MidiEvent = {
-  deltaTime: number;  // We'll assume deltaTime needs to be provided or calculated externally.
   type: 'noteOn' | 'noteOff' | 'pedalOn' | 'pedalOff' | 'controlChange';
   channel: number;
   pedalName?: PedalName;
@@ -35,7 +33,6 @@ function parseMidiBytes(midiBytes: Uint8Array): MidiEvent[] {
         const noteOnVelocity = midiBytes[i++];
         if (noteOnVelocity > 0) {  // Velocity of 0 is actually a Note Off in some contexts
           events.push({
-            deltaTime: 0,  // Example, should be calculated based on actual MIDI timing data
             type: 'noteOn',
             channel,
             midi: noteOnNumber,
@@ -43,7 +40,6 @@ function parseMidiBytes(midiBytes: Uint8Array): MidiEvent[] {
           });
         } else {
           events.push({
-            deltaTime: 0,  // Example, should be calculated
             type: 'noteOff',
             channel,
             midi: noteOnNumber
@@ -54,7 +50,6 @@ function parseMidiBytes(midiBytes: Uint8Array): MidiEvent[] {
         const noteOffNumber = midiBytes[i++];
         const noteOffVelocity = midiBytes[i++];  // Often ignored, but included for completeness
         events.push({
-          deltaTime: 0,  // Example, should be calculated
           type: 'noteOff',
           channel,
           midi: noteOffNumber
@@ -78,7 +73,6 @@ function parseMidiBytes(midiBytes: Uint8Array): MidiEvent[] {
               break;
           }
           events.push({
-            deltaTime: 0,  // Example, should be calculated
             type: pedalType,
             pedalName,
             channel,
@@ -87,7 +81,6 @@ function parseMidiBytes(midiBytes: Uint8Array): MidiEvent[] {
           })
         } else {
           events.push({
-            deltaTime: 0,  // Example, should be calculated
             type: 'controlChange',
             channel,
             controllerNumber,
