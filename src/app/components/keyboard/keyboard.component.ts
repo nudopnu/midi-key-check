@@ -14,7 +14,7 @@ export class KeyboardComponent {
     midi: 21 + index,
     isBlack: isBlackKey(21 + index),
     name: midiToPitchName(21 + index) + midiToOctave(21 + index),
-    pressed: this.notesService.pressed().indexOf(21 + index) !== -1,
+    pressed: this.notesService.state().pressed.indexOf(21 + index) !== -1,
   })));
 
   constructor(
@@ -23,12 +23,12 @@ export class KeyboardComponent {
   ) { }
 
   onClick(key: { midi: number; isBlack: boolean; name: string; pressed: boolean; }) {
-    const pressed = this.notesService.pressed();
+    const pressed = this.notesService.state().pressed;
     if (pressed.indexOf(key.midi) === -1) {
-      this.notesService.pressed.set([...pressed, key.midi]);
+      this.notesService.set('pressed', [...pressed, key.midi]);
       this.soundSynthesizerService.playPianoKey(key.midi);
     } else {
-      this.notesService.pressed.set(pressed.filter(midi => midi !== key.midi));
+      this.notesService.set('pressed', pressed.filter(midi => midi !== key.midi));
     }
   }
 }

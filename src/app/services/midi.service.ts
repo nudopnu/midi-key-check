@@ -1,4 +1,4 @@
-import { Injectable, NgZone } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { NotesService } from './notes.service';
 
 type PedalName = 'sustain' | 'sustenuto' | 'soft' | 'unknown';
@@ -141,14 +141,14 @@ export class MidiService {
     for (const midiEvent of midiEvents) {
       switch (midiEvent.type) {
         case 'noteOn':
-          this.notesService.pressed.set([...this.notesService.pressed(), midiEvent.midi!]);
+          this.notesService.set('pressed', [...this.notesService.state().pressed, midiEvent.midi!]);
           break;
         case 'noteOff':
-          this.notesService.pressed.set(this.notesService.pressed().filter(midi => midi !== midiEvent.midi));
+          this.notesService.set('pressed', this.notesService.state().pressed.filter(midi => midi !== midiEvent.midi));
           break;
         case 'pedalOn':
           if (midiEvent.pedalName !== "soft") break;
-          this.notesService.upperStave.set(!this.notesService.upperStave());
+          this.notesService.set('upperStave', !this.notesService.state().upperStave);
           break;
         case 'controlChange':
           break;
